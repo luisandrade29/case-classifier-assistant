@@ -1,0 +1,19 @@
+<template>
+    <lightning-card title="AI Case Assistant" icon-name="utility:einstein">
+        <lightning-button slot="actions" label="Refresh" onclick={refresh}></lightning-button>
+        <div class="slds-var-p-horizontal_medium">
+            <template lwc:if={isDone}>
+                <p><strong>Category:</strong> {category} &nbsp; <strong>Priority:</strong> {priority}</p>
+                <p class="slds-var-m-vertical_small">{summary}</p>
+                <lightning-textarea label="Suggested reply (review before sending)" value={reply} onchange={handleEdit} rows="8"></lightning-textarea>
+                <lightning-button class="slds-var-m-top_small" variant="brand" label="Copy reply" onclick={copy}></lightning-button>
+            </template>
+            <template lwc:elseif={isError}>
+                <p>The AI classification failed. Handle this case manually.</p>
+            </template>
+            <template lwc:else>
+                <p>Waiting for AI classification. Press Refresh in a few seconds.</p>
+            </template>
+        </div>
+    </lightning-card>
+</template>

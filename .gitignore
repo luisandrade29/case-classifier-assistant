@@ -1,0 +1,10 @@
+node_modules
+.sfdx
+.sf
+graphy-out
+.DS_Store
+*.log
+docs/*.MOV
+docs/*.mov
+docs/*.HEIC
+docs/*.heic
