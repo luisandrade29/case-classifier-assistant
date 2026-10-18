@@ -103,4 +103,33 @@ private class CaseClassifierTest {
         Test.stopTest();
         System.assertEquals(null, [SELECT AI_Status__c FROM Case WHERE Id = :c.Id].AI_Status__c);
     }
+
+    @IsTest
+    static void itIncidentCasesAreNotClassified() {
+        Schema.RecordTypeInfo rt = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('Incident_IT');
+        List<PermissionSet> ps = [SELECT Id FROM PermissionSet WHERE Name = 'Incident_Manager' LIMIT 1];
+        if (rt == null || ps.isEmpty()) {
+            // Returns early (instead of failing) because the "Incidente de TI" record type and its permission set belong
+            // to the separate Incident SLA Manager project and do not exist in an org that only has this classifier.
+            return;
+        }
+        // The record type is only usable by users holding that permission set, so insert as such a user.
+        User u = new User(
+            Alias = 'incmgr', Email = 'incmgr@example.invalid', EmailEncodingKey = 'UTF-8', LastName = 'IncidentMgr',
+            LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', TimeZoneSidKey = 'Europe/Lisbon',
+            ProfileId = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1].Id,
+            Username = 'incmgr' + System.currentTimeMillis() + '@example.invalid'
+        );
+        insert u;
+        insert new PermissionSetAssignment(AssigneeId = u.Id, PermissionSetId = ps[0].Id);
+
+        Case c = new Case(Subject = 'Server down', Description = 'Production is unreachable');
+        c.put('RecordTypeId', rt.getRecordTypeId());
+        Test.startTest();
+        System.runAs(u) {
+            insert c;
+        }
+        Test.stopTest();
+        System.assertEquals(null, [SELECT AI_Status__c FROM Case WHERE Id = :c.Id].AI_Status__c, 'incident cases must not be classified');
+    }
 }
