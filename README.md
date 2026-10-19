@@ -89,3 +89,7 @@ Coverage at last run: `ClaudeProvider` 97%, `CaseClassifierQueueable` 96%, `Case
 ## Not included
 
 Queue assignment with a Flow on `AI_Category__c`, a reclassify button, Knowledge/RAG grounding and a feedback loop for agent corrections.
+
+## Credits
+
+Built with Claude Code as a pair-programming tool; design decisions, testing and review by me.
